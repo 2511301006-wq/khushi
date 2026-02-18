@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Select a quiz subject – Science, Math, History, Geography, or Computer Science.">
+    <title>Choose Subject – AntiGravity Quiz</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-landing" data-page="subjects">
+
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <a href="index.html" class="nav-brand">
+            <span class="g">A</span><span class="a1">n</span><span class="q">t</span><span class="u">i</span><span
+                class="i">G</span><span class="z">Q</span>
+        </a>
+        <a href="instructions.html" class="back-btn">← Instructions</a>
+    </nav>
+
+    <!-- Floating background -->
+    <div class="floating-elements">
+        <div class="floating-el"></div>
+        <div class="floating-el"></div>
+        <div class="floating-el"></div>
+        <div class="floating-el"></div>
+        <div class="floating-el"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="page-wrapper" style="padding-top: 80px;">
+        <div class="container">
+
+            <h1
+                style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; text-align: center; margin-bottom: 0.5rem; animation: slideUp 0.5s ease-out both;">
+                🎯 Pick Your Subject
+            </h1>
+            <p class="subtitle">Each subject has a unique animated background. Choose wisely!</p>
+
+            <!-- Subject Grid -->
+            <div class="subject-grid">
+
+                <a href="science.html" class="subject-card science" data-subject="science">
+                    <span class="subject-icon">🔬</span>
+                    <h3>Science</h3>
+                    <p>Space, atoms, and discovery</p>
+                    <span class="status-badge not-started">Not started</span>
+                </a>
+
+                <a href="math.html" class="subject-card math" data-subject="math">
+                    <span class="subject-icon">📐</span>
+                    <h3>Mathematics</h3>
+                    <p>Numbers, geometry, and logic</p>
+                    <span class="status-badge not-started">Not started</span>
+                </a>
+
+                <a href="history.html" class="subject-card history" data-subject="history">
+                    <span class="subject-icon">📜</span>
+                    <h3>History</h3>
+                    <p>Events, civilizations, and eras</p>
+                    <span class="status-badge not-started">Not started</span>
+                </a>
+
+                <a href="geography.html" class="subject-card geography" data-subject="geography">
+                    <span class="subject-icon">🌍</span>
+                    <h3>Geography</h3>
+                    <p>Earth, maps, and landscapes</p>
+                    <span class="status-badge not-started">Not started</span>
+                </a>
+
+                <a href="cs.html" class="subject-card cs" data-subject="cs">
+                    <span class="subject-icon">💻</span>
+                    <h3>Computer Science</h3>
+                    <p>Code, algorithms, and tech</p>
+                    <span class="status-badge not-started">Not started</span>
+                </a>
+
+            </div>
+
+            <!-- Actions -->
+            <div class="text-center mt-2" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="results.html" class="btn btn-secondary">View Results 📊</a>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="footer">
+        <span>Built with ❤️ &amp; zero gravity</span>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

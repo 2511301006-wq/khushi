@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Final Summary – Your total score, grade, and performance breakdown in the AntiGravity Quiz.">
+    <title>Final Summary – AntiGravity Quiz</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Summary-specific styles */
+        .summary-hero {
+            text-align: center;
+            padding: var(--space-2xl) 0;
+            animation: slideUp 0.6s ease-out both;
+        }
+
+        .grade-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
+            margin: var(--space-lg) auto;
+            animation: floatDeep 5s ease-in-out infinite;
+            box-shadow: 0 8px 32px rgba(66, 133, 244, 0.4);
+        }
+
+        .breakdown-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-md) var(--space-lg);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-sm);
+            transition: all var(--transition-smooth);
+        }
+
+        .breakdown-row:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(6px);
+        }
+
+        .breakdown-icon {
+            font-size: 1.3rem;
+        }
+
+        .breakdown-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .breakdown-score {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .breakdown-percent {
+            font-weight: 700;
+            min-width: 45px;
+            text-align: right;
+        }
+
+        .credits {
+            text-align: center;
+            margin-top: var(--space-2xl);
+            padding: var(--space-xl);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .credits h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+            color: var(--text-secondary);
+        }
+
+        .credits p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+    </style>
+</head>
+
+<body class="bg-landing" data-page="summary">
+
+    <!-- Floating background -->
+    <div class="floating-elements">
+        <div class="floating-el"></div>
+        <div class="floating-el"></div>
+        <div class="floating-el"></div>
+        <div class="floating-el"></div>
+        <div class="floating-el"></div>
+        <div class="floating-el"></div>
+    </div>
+
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <a href="index.html" class="nav-brand">
+            <span class="g">A</span><span class="a1">n</span><span class="q">t</span><span class="u">i</span><span
+                class="i">G</span><span class="z">Q</span>
+        </a>
+        <a href="results.html" class="back-btn">← Results</a>
+    </nav>
+
+    <!-- Content -->
+    <div class="page-wrapper" style="padding-top: 80px;">
+        <div class="container">
+
+            <!-- Hero -->
+            <div class="summary-hero">
+                <h1 style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; margin-bottom: 0.3rem;">
+                    🏆 Final Summary
+                </h1>
+                <p class="subtitle">Here's how you performed across all subjects</p>
+
+                <!-- Grade Badge -->
+                <div class="grade-badge" id="summary-grade">—</div>
+
+                <!-- Score Circle -->
+                <div class="score-circle" id="summary-circle" style="margin: var(--space-xl) auto;">
+                    <span class="big-score" id="summary-total">0</span>
+                    <span class="score-label">out of <span id="summary-max">25</span></span>
+                </div>
+
+                <p style="font-size: 1.2rem; font-weight: 600; color: var(--text-primary);">
+                    Accuracy: <span id="summary-percent" style="color: var(--primary);">0%</span>
+                </p>
+            </div>
+
+            <!-- Detailed Breakdown -->
+            <div class="glass-card" style="margin-top: var(--space-xl); animation: scaleIn 0.6s ease-out 0.3s both;">
+                <h2 style="font-size: 1.2rem; font-weight: 700; margin-bottom: var(--space-lg); text-align: center;">
+                    📋 Detailed Breakdown
+                </h2>
+                <div id="summary-breakdown">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div
+                style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: var(--space-2xl);">
+                <button class="btn btn-primary btn-lg" onclick="resetAllQuizzes(); navigateTo('index.html');">
+                    🔄 Restart Quiz
+                </button>
+                <a href="subjects.html" class="btn btn-secondary btn-lg">
+                    🎯 Retake Subjects
+                </a>
+            </div>
+
+            <!-- Credits -->
+            <div class="credits">
+                <h3>Credits</h3>
+                <p>
+                    Designed &amp; built with ❤️ — Inspired by Google Antigravity<br>
+                    HTML • CSS • JavaScript — No frameworks, no libraries<br>
+                    Floating animations powered by CSS keyframes<br>
+                    Quiz data stored locally in your browser
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="footer">
+        <span>Built with ❤️ &amp; zero gravity • AntiGravity Quiz © 2026</span>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
