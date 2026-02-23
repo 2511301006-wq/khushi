@@ -1,741 +1,732 @@
-/* ============================================================
-   GOOGLE ANTIGRAVITY QUIZ - MAIN JAVASCRIPT
-   ============================================================
-   Handles quiz logic, scoring, localStorage, navigation,
-   and dynamic background/animation generation.
-   ============================================================ */
+/* ============================================
+   Government Welfare Schemes — Script
+   ============================================ */
 
-// ===================== QUESTION BANKS =====================
-// Each subject has 5 multiple-choice questions.
-// Format: { question, options (array of 4), answer (index 0-3) }
+// ---------- Scheme Data Store ----------
+const SCHEMES = [
+  {
+    id: 'pm-kisan',
+    name: 'PM Kisan Samman Nidhi',
+    category: 'Agriculture',
+    icon: '🌾',
+    shortDesc: 'Direct income support of ₹6,000 per year to farmer families for purchasing farm inputs.',
+    description: 'Pradhan Mantri Kisan Samman Nidhi (PM-KISAN) is a central sector scheme that provides income support to all landholding farmer families across the country. Under this scheme, ₹6,000 per year is transferred directly into bank accounts of eligible farmer families in three equal instalments of ₹2,000 each.',
+    benefits: [
+      { icon: '💰', text: '₹6,000 per year in three equal instalments of ₹2,000' },
+      { icon: '🏦', text: 'Direct bank transfer (DBT) ensuring no middlemen' },
+      { icon: '📋', text: 'Helps farmers meet agricultural and household needs' },
+      { icon: '🔄', text: 'Regular income support every four months' }
+    ],
+    eligibility: [
+      'Must be a landholding farmer family',
+      'Must have cultivable land as per land records of the respective state/UT',
+      'Institutional landholders are excluded',
+      'Former and present holders of constitutional posts are not eligible',
+      'Income tax payers in last assessment year are excluded',
+      'Professionals like doctors, engineers, lawyers, CAs registered with professional bodies are excluded'
+    ],
+    howToApply: [
+      'Visit the official PM-KISAN portal at pmkisan.gov.in',
+      'Click on "New Farmer Registration" and select your state',
+      'Enter Aadhaar number and captcha code',
+      'Fill in personal, bank account, and land details',
+      'Upload supporting documents and submit the application',
+      'Track your application status using the "Beneficiary Status" option'
+    ],
+    ministry: 'Ministry of Agriculture & Farmers Welfare',
+    launchYear: '2019',
+    budget: '₹60,000 Crore',
+    beneficiaries: '11+ Crore',
+    officialLink: 'https://pmkisan.gov.in'
+  },
+  {
+    id: 'pm-awas',
+    name: 'PM Awas Yojana',
+    category: 'Housing',
+    icon: '🏠',
+    shortDesc: 'Affordable housing for the urban and rural poor with credit-linked subsidy on home loans.',
+    description: 'Pradhan Mantri Awas Yojana (PMAY) aims to provide affordable housing to the urban and rural poor. The scheme offers credit-linked subsidy on home loans for purchase, construction, or enhancement of houses. It targets "Housing for All" by providing pucca houses with basic amenities.',
+    benefits: [
+      { icon: '🏗️', text: 'Subsidy up to ₹2.67 lakh on home loan interest rates' },
+      { icon: '🏡', text: 'Financial assistance of ₹1.2 to ₹1.5 lakh for rural housing' },
+      { icon: '🚰', text: 'Houses with toilet, electricity, water, and LPG connection' },
+      { icon: '👩', text: 'Mandatory ownership or co-ownership for women members' }
+    ],
+    eligibility: [
+      'Beneficiary family should not own a pucca house anywhere in India',
+      'Annual household income up to ₹18 lakh (for MIG category)',
+      'For EWS category: annual income up to ₹3 lakh',
+      'For LIG category: annual income between ₹3 to ₹6 lakh',
+      'The house must be in the name of a female member or jointly owned',
+      'Must not have availed central government housing assistance earlier'
+    ],
+    howToApply: [
+      'Visit the PMAY official website at pmaymis.gov.in',
+      'Click "Citizen Assessment" and select the appropriate category',
+      'Enter your Aadhaar number for verification',
+      'Fill the online application form with personal & income details',
+      'Submit the form and note down the application reference number',
+      'Visit nearest Common Service Centre (CSC) to apply offline if needed'
+    ],
+    ministry: 'Ministry of Housing & Urban Affairs',
+    launchYear: '2015',
+    budget: '₹48,000 Crore',
+    beneficiaries: '2.95+ Crore',
+    officialLink: 'https://pmaymis.gov.in'
+  },
+  {
+    id: 'ayushman-bharat',
+    name: 'Ayushman Bharat – PMJAY',
+    category: 'Health',
+    icon: '🏥',
+    shortDesc: 'Health insurance cover of ₹5 lakh per family per year for secondary and tertiary care hospitalisation.',
+    description: 'Ayushman Bharat Pradhan Mantri Jan Arogya Yojana (PMJAY) is the world\'s largest health assurance scheme. It provides a health cover of ₹5 lakh per family per year for secondary and tertiary care hospitalisation at empanelled hospitals across India. The scheme covers over 1,900 medical procedures.',
+    benefits: [
+      { icon: '🏥', text: '₹5 lakh health cover per family per year' },
+      { icon: '📋', text: 'Covers 1,900+ medical procedures including surgeries' },
+      { icon: '💊', text: 'Cashless and paperless treatment at empanelled hospitals' },
+      { icon: '👨‍👩‍👧‍👦', text: 'No restriction on family size, age, or gender' }
+    ],
+    eligibility: [
+      'Families identified based on SECC (Socio-Economic Caste Census) 2011 data',
+      'Rural: families with deprivation criteria (kutcha house, no adult earning member, SC/ST households etc.)',
+      'Urban: workers in vulnerable occupational categories',
+      'No cap on family size — covers all members',
+      'Pre-existing diseases are covered from day one',
+      'All public and empanelled private hospitals across India are covered'
+    ],
+    howToApply: [
+      'Check eligibility at mera.pmjay.gov.in using mobile number or ration card',
+      'Visit nearest Ayushman Bharat Kendra or empanelled hospital',
+      'Carry Aadhaar card, ration card, and any other government ID',
+      'Complete biometric verification at the hospital',
+      'Receive the Ayushman card (Golden Card) post verification',
+      'Avail cashless treatment at any PMJAY-empanelled hospital'
+    ],
+    ministry: 'Ministry of Health & Family Welfare',
+    launchYear: '2018',
+    budget: '₹7,200 Crore',
+    beneficiaries: '55+ Crore',
+    officialLink: 'https://pmjay.gov.in'
+  },
+  {
+    id: 'jan-dhan',
+    name: 'PM Jan Dhan Yojana',
+    category: 'Financial Inclusion',
+    icon: '🏦',
+    shortDesc: 'Universal access to banking services with zero-balance accounts and RuPay debit cards.',
+    description: 'Pradhan Mantri Jan Dhan Yojana (PMJDY) is one of the biggest financial inclusion initiatives in the world. It provides access to financial services such as savings/deposit accounts, remittance, credit, insurance, and pension with zero balance requirement. Each account holder gets a RuPay debit card.',
+    benefits: [
+      { icon: '🏦', text: 'Zero balance savings account at any bank' },
+      { icon: '💳', text: 'Free RuPay debit card with ₹2 lakh accident insurance' },
+      { icon: '🛡️', text: 'Life insurance cover of ₹30,000 for accounts opened before Jan 2015' },
+      { icon: '💸', text: 'Overdraft facility of ₹10,000 for eligible accounts' }
+    ],
+    eligibility: [
+      'Any Indian citizen above 10 years of age',
+      'Does not have any existing bank account',
+      'Minor accounts can be opened with a guardian',
+      'Aadhaar card or any officially valid document required for KYC',
+      'Even small accounts can be opened with simplified KYC norms',
+      'No minimum balance requirement'
+    ],
+    howToApply: [
+      'Visit your nearest bank branch or Banking Correspondent outlet',
+      'Fill the Jan Dhan account opening form',
+      'Submit KYC documents (Aadhaar, Voter ID, or PAN card)',
+      'Provide a recent passport-size photograph',
+      'The bank will process and open the zero-balance account',
+      'Collect your RuPay debit card and passbook'
+    ],
+    ministry: 'Ministry of Finance',
+    launchYear: '2014',
+    budget: 'N/A',
+    beneficiaries: '52+ Crore',
+    officialLink: 'https://pmjdy.gov.in'
+  },
+  {
+    id: 'sukanya-samriddhi',
+    name: 'Sukanya Samriddhi Yojana',
+    category: 'Women & Child',
+    icon: '👧',
+    shortDesc: 'Small savings scheme for girl child with high interest rates and tax benefits under Sec 80C.',
+    description: 'Sukanya Samriddhi Yojana (SSY) is a government-backed savings scheme aimed at parents of girl children. It offers one of the highest interest rates among small saving instruments and provides tax benefits under Section 80C. The account matures after 21 years or upon marriage of the girl after age 18.',
+    benefits: [
+      { icon: '📈', text: 'High interest rate of ~8% per annum, compounded yearly' },
+      { icon: '💰', text: 'Tax benefits under Section 80C of Income Tax Act' },
+      { icon: '🎓', text: 'Partial withdrawal allowed (50%) for higher education after age 18' },
+      { icon: '🔒', text: 'Fully government-backed — safe and secure investment' }
+    ],
+    eligibility: [
+      'Account can be opened for a girl child below 10 years of age',
+      'Only one account per girl child is allowed',
+      'Maximum two accounts per family (exception for twins/triplets)',
+      'Minimum deposit ₹250 per year, maximum ₹1.5 lakh per year',
+      'The depositor must be the natural or legal guardian',
+      'Account can be opened at any post office or authorized bank'
+    ],
+    howToApply: [
+      'Visit nearest post office or authorized bank (SBI, PNB, ICICI etc.)',
+      'Fill out SSY account opening form (Form-1)',
+      'Submit birth certificate of the girl child',
+      'Submit identity and address proof of the guardian (Aadhaar, PAN)',
+      'Make initial deposit (minimum ₹250)',
+      'Receive the passbook and maintain yearly minimum deposits'
+    ],
+    ministry: 'Ministry of Finance',
+    launchYear: '2015',
+    budget: 'N/A',
+    beneficiaries: '3+ Crore',
+    officialLink: 'https://www.india.gov.in/sukanya-samriddhi-yojna'
+  },
+  {
+    id: 'ujjwala',
+    name: 'PM Ujjwala Yojana',
+    category: 'Women & Child',
+    icon: '🔥',
+    shortDesc: 'Free LPG connections for women from below poverty line households to reduce indoor air pollution.',
+    description: 'Pradhan Mantri Ujjwala Yojana (PMUY) aims to safeguard the health of women and children by providing free LPG connections to women from Below Poverty Line (BPL) households. The scheme helps replace unclean cooking fuels with clean LPG, reducing indoor air pollution and associated health risks.',
+    benefits: [
+      { icon: '🔥', text: 'Free LPG connection with a deposit-free cylinder' },
+      { icon: '💰', text: 'Financial assistance of ₹1,600 for each LPG connection' },
+      { icon: '🏠', text: 'Reduces indoor air pollution and improves family health' },
+      { icon: '⏱️', text: 'Saves time spent on collecting firewood' }
+    ],
+    eligibility: [
+      'Women belonging to Below Poverty Line (BPL) families',
+      'Must be above 18 years of age',
+      'No existing LPG connection in the household',
+      'Identified through SECC-2011 data or specific priority categories',
+      'SC/ST households, beneficiaries of PMAY, and forest dwellers are prioritized',
+      'Must have a Jan Dhan or savings bank account'
+    ],
+    howToApply: [
+      'Visit the nearest LPG distributor (Indane, Bharat Gas, HP Gas)',
+      'Fill the Ujjwala application form (KYC form)',
+      'Submit Aadhaar card, BPL certificate, and ration card',
+      'Provide a bank account passbook copy',
+      'Submit a passport-size photograph',
+      'Collect the LPG connection after verification and approval'
+    ],
+    ministry: 'Ministry of Petroleum & Natural Gas',
+    launchYear: '2016',
+    budget: '₹12,800 Crore',
+    beneficiaries: '10+ Crore',
+    officialLink: 'https://www.pmuy.gov.in'
+  },
+  {
+    id: 'mgnrega',
+    name: 'MGNREGA',
+    category: 'Employment',
+    icon: '👷',
+    shortDesc: 'Guarantees 100 days of wage employment per year to every rural household for unskilled manual work.',
+    description: 'The Mahatma Gandhi National Rural Employment Guarantee Act (MGNREGA) guarantees 100 days of wage employment per financial year to every rural household whose adult members volunteer to do unskilled manual work. It enhances livelihood security and creates durable community assets.',
+    benefits: [
+      { icon: '💼', text: '100 days of guaranteed wage employment per household per year' },
+      { icon: '💰', text: 'Wages directly transferred to bank/post office accounts' },
+      { icon: '🏗️', text: 'Creates community infrastructure: roads, wells, irrigation canals' },
+      { icon: '📋', text: 'Unemployment allowance if work not provided within 15 days' }
+    ],
+    eligibility: [
+      'Adult members of any rural household willing to do unskilled manual work',
+      'Must apply for a Job Card at the local Gram Panchayat',
+      'Applicant must be above 18 years of age',
+      'Must be a resident of the rural area where the application is made',
+      'Job Card is valid for 5 years across the entire family',
+      'Both men and women are eligible with equal wages'
+    ],
+    howToApply: [
+      'Visit the Gram Panchayat office in your village',
+      'Apply for a Job Card with a passport-size photograph',
+      'Job Card will be issued within 15 days after verification',
+      'Submit a written demand for work to the Gram Panchayat',
+      'Work must be provided within 15 days of demand',
+      'Wages will be credited to your bank/post office account within 15 days'
+    ],
+    ministry: 'Ministry of Rural Development',
+    launchYear: '2006',
+    budget: '₹86,000 Crore',
+    beneficiaries: '7+ Crore Households',
+    officialLink: 'https://nrega.nic.in'
+  },
+  {
+    id: 'samagra-shiksha',
+    name: 'Samagra Shiksha Abhiyan',
+    category: 'Education',
+    icon: '📚',
+    shortDesc: 'Integrated programme for school education covering pre-school to Class XII for quality education.',
+    description: 'Samagra Shiksha is an integrated scheme for school education from pre-school to Class XII. It subsumes three earlier schemes — Sarva Shiksha Abhiyan (SSA), Rashtriya Madhyamik Shiksha Abhiyan (RMSA), and Teacher Education. It aims to improve school effectiveness, ensure equity, and promote inclusion.',
+    benefits: [
+      { icon: '📖', text: 'Free textbooks, uniforms, and transport for eligible students' },
+      { icon: '🏫', text: 'Infrastructure development: classrooms, libraries, labs' },
+      { icon: '👩‍🏫', text: 'Teacher training and professional development' },
+      { icon: '💻', text: 'Digital learning resources and ICT integration in schools' }
+    ],
+    eligibility: [
+      'All students from pre-school to Class XII in government and aided schools',
+      'Special focus on girls, SC/ST, minority, and CWSN students',
+      'Students from economically weaker sections get additional support',
+      'Schools in rural and urban areas across all states and UTs',
+      'Teachers in government schools eligible for training programs',
+      'Schools must be recognized by the respective state education board'
+    ],
+    howToApply: [
+      'Enroll in any government or government-aided school',
+      'Benefits are automatically provided to enrolled students',
+      'Parents can approach Block Education Officer for specific entitlements',
+      'Schools apply for infrastructure grants through state education departments',
+      'Teachers register through DIKSHA portal for training modules',
+      'States submit Annual Work Plans for fund allocation under the scheme'
+    ],
+    ministry: 'Ministry of Education',
+    launchYear: '2018',
+    budget: '₹37,453 Crore',
+    beneficiaries: '26+ Crore Students',
+    officialLink: 'https://samagra.education.gov.in'
+  },
+  {
+    id: 'mudra',
+    name: 'PM Mudra Yojana',
+    category: 'Employment',
+    icon: '🏢',
+    shortDesc: 'Collateral-free loans up to ₹10 lakh for micro and small enterprises under Shishu, Kishore, Tarun.',
+    description: 'Pradhan Mantri MUDRA Yojana (PMMY) provides collateral-free micro loans up to ₹10 lakh to non-corporate, non-farm small/micro enterprises. The loans are offered in three categories: Shishu (up to ₹50,000), Kishore (₹50,001 to ₹5 lakh), and Tarun (₹5,00,001 to ₹10 lakh).',
+    benefits: [
+      { icon: '💰', text: 'Collateral-free loans — no security or guarantor needed' },
+      { icon: '📊', text: 'Three categories: Shishu, Kishore, Tarun based on loan amount' },
+      { icon: '🏦', text: 'Available through all public & private sector banks, NBFCs, MFIs' },
+      { icon: '📋', text: 'MUDRA card for withdrawing working capital as needed' }
+    ],
+    eligibility: [
+      'Any Indian citizen with a business plan for non-farm income activity',
+      'Micro and small enterprises including manufacturing, trading, and services',
+      'New and existing entrepreneurs; no restriction on business vintage',
+      'Women entrepreneurs given priority under Mahila Udyami scheme',
+      'SC/ST and minority applicants are encouraged',
+      'Business should not be a defaulter to any bank/financial institution'
+    ],
+    howToApply: [
+      'Visit the nearest bank branch or NBFC offering MUDRA loans',
+      'Download and fill the MUDRA loan application form',
+      'Submit business plan/project report along with identity proof',
+      'Provide address proof, photographs, and business documents',
+      'Bank will process the application — usually within 7–10 working days',
+      'Apply online through the Udyamimitra portal at udyamimitra.in'
+    ],
+    ministry: 'Ministry of Finance',
+    launchYear: '2015',
+    budget: '₹3 Lakh Crore (cumulative)',
+    beneficiaries: '47+ Crore Loans Sanctioned',
+    officialLink: 'https://www.mudra.org.in'
+  },
+  {
+    id: 'atal-pension',
+    name: 'Atal Pension Yojana',
+    category: 'Financial Inclusion',
+    icon: '🧓',
+    shortDesc: 'Guaranteed pension of ₹1,000 to ₹5,000/month after age 60 for unorganised sector workers.',
+    description: 'Atal Pension Yojana (APY) is the government\'s guaranteed pension scheme targeted at the unorganised sector workers. It provides a fixed pension of ₹1,000 to ₹5,000 per month after the age of 60, depending on the contribution and the age of joining.',
+    benefits: [
+      { icon: '🧓', text: 'Guaranteed monthly pension of ₹1,000 to ₹5,000 after age 60' },
+      { icon: '👨‍👩‍👧', text: 'Same pension amount to spouse after subscriber\'s death' },
+      { icon: '💰', text: 'Return of accumulated corpus to nominee on death of both' },
+      { icon: '🏛️', text: 'Government guaranteed — safe and assured returns' }
+    ],
+    eligibility: [
+      'Indian citizen between 18 and 40 years of age',
+      'Must have a savings bank account',
+      'Must link Aadhaar and mobile number to the bank account',
+      'Not a member of any statutory social security scheme',
+      'Income tax payers are not eligible (from Oct 2022)',
+      'Contribution continues until age 60; pension starts from age 60'
+    ],
+    howToApply: [
+      'Visit your bank branch where you hold a savings account',
+      'Fill the APY registration form available at the bank',
+      'Choose the desired pension amount (₹1,000 to ₹5,000/month)',
+      'Provide Aadhaar number and mobile number',
+      'Set up auto-debit from your savings account for contributions',
+      'Can also enroll through net banking or mobile banking apps'
+    ],
+    ministry: 'Ministry of Finance (PFRDA)',
+    launchYear: '2015',
+    budget: 'N/A',
+    beneficiaries: '6+ Crore',
+    officialLink: 'https://www.npscra.nsdl.co.in/scheme-details.php'
+  },
+  {
+    id: 'fasal-bima',
+    name: 'PM Fasal Bima Yojana',
+    category: 'Agriculture',
+    icon: '🌱',
+    shortDesc: 'Affordable crop insurance for farmers with premium as low as 2% for Kharif and 1.5% for Rabi crops.',
+    description: 'Pradhan Mantri Fasal Bima Yojana (PMFBY) provides comprehensive crop insurance cover against crop loss/damage arising from unforeseen events at very low premium rates. It uses technology like satellite imagery, drones, and AI for fast claim settlement.',
+    benefits: [
+      { icon: '🌾', text: 'Premium as low as 2% for Kharif, 1.5% for Rabi, 5% for horticulture' },
+      { icon: '📱', text: 'Claim settlement within 2 months using technology-driven assessment' },
+      { icon: '🌧️', text: 'Covers natural calamities, pests, diseases, and post-harvest losses' },
+      { icon: '💰', text: 'No cap on government subsidy — full sum insured coverage' }
+    ],
+    eligibility: [
+      'All farmers including sharecroppers and tenant farmers',
+      'Must be growing notified crops in notified areas',
+      'Voluntary for all farmers (since Kharif 2020)',
+      'Loanee farmers must have crop loan account with a bank',
+      'Non-loanee farmers can also apply through CSC centers or agents',
+      'Must submit crop sowing declaration within the specified window'
+    ],
+    howToApply: [
+      'Visit the nearest bank, CSC center, or insurance company agent',
+      'Apply online at pmfby.gov.in or through the crop insurance app',
+      'Submit land records, Aadhaar, bank details, and sowing certificate',
+      'Pay the farmer\'s share of premium (subsidized rate)',
+      'Enrolment window: before sowing season deadline for each crop',
+      'Report crop loss within 72 hours through the portal or helpline 14447'
+    ],
+    ministry: 'Ministry of Agriculture & Farmers Welfare',
+    launchYear: '2016',
+    budget: '₹15,500 Crore',
+    beneficiaries: '4+ Crore',
+    officialLink: 'https://pmfby.gov.in'
+  },
+  {
+    id: 'beti-bachao',
+    name: 'Beti Bachao Beti Padhao',
+    category: 'Women & Child',
+    icon: '👩‍🎓',
+    shortDesc: 'National campaign for survival, protection, education, and empowerment of the girl child.',
+    description: 'Beti Bachao Beti Padhao (BBBP) is a campaign of the Government of India that aims to generate awareness and improve the efficiency of welfare services intended for girls. It addresses the declining Child Sex Ratio and promotes education and empowerment of girls.',
+    benefits: [
+      { icon: '📚', text: 'Promotes girl child education and enrollment in schools' },
+      { icon: '🏥', text: 'Improved health and nutrition services for young girls' },
+      { icon: '⚖️', text: 'Enforcement against sex-selective elimination (PC&PNDT Act)' },
+      { icon: '🎯', text: 'Community mobilization and awareness campaigns' }
+    ],
+    eligibility: [
+      'All girl children and their families across India',
+      'Initially focused on 100 districts with low Child Sex Ratio (CSR)',
+      'Now expanded to all 640+ districts across the country',
+      'Multi-sectoral approach involving Health, Education, and WCD departments',
+      'Schools, Anganwadi centres, and hospitals participate',
+      'Any citizen can join awareness campaigns and report violations'
+    ],
+    howToApply: [
+      'Benefits are delivered through existing government infrastructure',
+      'Enroll girl children in nearby schools — education is free and compulsory',
+      'Visit Anganwadi centers for health and nutrition services',
+      'Report sex-selective practices to the district magistrate or call 181',
+      'Participate in community awareness programmes and rallies',
+      'Access resources at wcd.nic.in for detailed information'
+    ],
+    ministry: 'Ministry of Women & Child Development',
+    launchYear: '2015',
+    budget: '₹1,100 Crore',
+    beneficiaries: 'All Girls Nationwide',
+    officialLink: 'https://wcd.nic.in/bbbp-schemes'
+  }
+];
 
-const QUESTIONS = {
-
-  science: [
-    {
-      question: "What is the speed of light in vacuum (approximately)?",
-      options: ["3 × 10⁶ m/s", "3 × 10⁸ m/s", "3 × 10¹⁰ m/s", "3 × 10⁴ m/s"],
-      answer: 1
-    },
-    {
-      question: "Which planet is known as the Red Planet?",
-      options: ["Venus", "Jupiter", "Mars", "Saturn"],
-      answer: 2
-    },
-    {
-      question: "What is the chemical symbol for Gold?",
-      options: ["Go", "Gd", "Au", "Ag"],
-      answer: 2
-    },
-    {
-      question: "DNA stands for:",
-      options: [
-        "Deoxyribonucleic Acid",
-        "Dinitrogen Acid",
-        "Deoxyribose Nucleic Atom",
-        "Dynamic Nuclear Acid"
-      ],
-      answer: 0
-    },
-    {
-      question: "What force keeps planets in orbit around the Sun?",
-      options: ["Electromagnetic force", "Nuclear force", "Gravitational force", "Friction"],
-      answer: 2
-    }
-  ],
-
-  math: [
-    {
-      question: "What is the value of π (pi) rounded to two decimal places?",
-      options: ["3.41", "3.14", "3.16", "2.14"],
-      answer: 1
-    },
-    {
-      question: "What is the derivative of x²?",
-      options: ["x", "2x", "x²", "2x²"],
-      answer: 1
-    },
-    {
-      question: "What is the square root of 144?",
-      options: ["14", "11", "13", "12"],
-      answer: 3
-    },
-    {
-      question: "In a right triangle, what does the Pythagorean theorem state?",
-      options: [
-        "a + b = c",
-        "a² + b² = c²",
-        "a² - b² = c²",
-        "a × b = c²"
-      ],
-      answer: 1
-    },
-    {
-      question: "What is 15% of 200?",
-      options: ["20", "25", "30", "35"],
-      answer: 2
-    }
-  ],
-
-  history: [
-    {
-      question: "In which year did World War II end?",
-      options: ["1943", "1944", "1945", "1946"],
-      answer: 2
-    },
-    {
-      question: "Who was the first President of the United States?",
-      options: ["Thomas Jefferson", "George Washington", "Abraham Lincoln", "John Adams"],
-      answer: 1
-    },
-    {
-      question: "The ancient city of Rome was built on how many hills?",
-      options: ["5", "6", "7", "8"],
-      answer: 2
-    },
-    {
-      question: "Which civilization built the Machu Picchu complex?",
-      options: ["Aztec", "Maya", "Inca", "Olmec"],
-      answer: 2
-    },
-    {
-      question: "The French Revolution began in which year?",
-      options: ["1776", "1789", "1804", "1815"],
-      answer: 1
-    }
-  ],
-
-  geography: [
-    {
-      question: "What is the largest continent by area?",
-      options: ["Africa", "North America", "Asia", "Europe"],
-      answer: 2
-    },
-    {
-      question: "Which river is the longest in the world?",
-      options: ["Amazon", "Yangtze", "Mississippi", "Nile"],
-      answer: 3
-    },
-    {
-      question: "What is the capital of Australia?",
-      options: ["Sydney", "Melbourne", "Canberra", "Brisbane"],
-      answer: 2
-    },
-    {
-      question: "Mount Everest is located in which mountain range?",
-      options: ["Andes", "Alps", "Rockies", "Himalayas"],
-      answer: 3
-    },
-    {
-      question: "Which country has the most natural lakes?",
-      options: ["United States", "Canada", "Russia", "Brazil"],
-      answer: 1
-    }
-  ],
-
-  cs: [
-    {
-      question: "What does 'HTML' stand for?",
-      options: [
-        "Hyper Text Markup Language",
-        "High Tech Modern Language",
-        "Hyper Transfer Markup Language",
-        "Home Tool Markup Language"
-      ],
-      answer: 0
-    },
-    {
-      question: "Which data structure uses FIFO (First In, First Out)?",
-      options: ["Stack", "Queue", "Tree", "Graph"],
-      answer: 1
-    },
-    {
-      question: "What is the time complexity of binary search?",
-      options: ["O(n)", "O(n²)", "O(log n)", "O(1)"],
-      answer: 2
-    },
-    {
-      question: "Which programming language was created by Guido van Rossum?",
-      options: ["Java", "C++", "Ruby", "Python"],
-      answer: 3
-    },
-    {
-      question: "What does 'CSS' stand for?",
-      options: [
-        "Computer Style Sheets",
-        "Cascading Style Sheets",
-        "Creative Style System",
-        "Colorful Style Sheets"
-      ],
-      answer: 1
-    }
-  ]
+// ---------- Category icon classes mapping ----------
+const CATEGORY_ICON_CLASS = {
+  'Agriculture':         'scheme-card__icon--agriculture',
+  'Housing':             'scheme-card__icon--housing',
+  'Health':              'scheme-card__icon--health',
+  'Financial Inclusion': 'scheme-card__icon--financial',
+  'Women & Child':       'scheme-card__icon--women',
+  'Employment':          'scheme-card__icon--employment',
+  'Education':           'scheme-card__icon--education'
 };
 
-// Subject display names and colors
-const SUBJECT_META = {
-  science:   { name: "Science",          icon: "🔬", color: "#4285f4" },
-  math:      { name: "Mathematics",      icon: "📐", color: "#a142f4" },
-  history:   { name: "History",           icon: "📜", color: "#fbbc05" },
-  geography: { name: "Geography",        icon: "🌍", color: "#34a853" },
-  cs:        { name: "Computer Science",  icon: "💻", color: "#00bcd4" }
-};
+// ---------- DOM Ready ----------
+document.addEventListener('DOMContentLoaded', () => {
+  initNavbar();
+  initScrollAnimations();
+  detectPage();
+});
 
-// ===================== QUIZ ENGINE =====================
-
-/**
- * QuizEngine manages the state for one quiz subject at a time.
- * It reads & writes progress to localStorage.
- */
-class QuizEngine {
-  constructor(subject) {
-    this.subject = subject;
-    this.questions = QUESTIONS[subject] || [];
-    this.currentIndex = 0;
-    this.answers = new Array(this.questions.length).fill(null);
-    this.score = 0;
-    this.isComplete = false;
-
-    // Load any saved progress for this subject
-    this.loadProgress();
-  }
-
-  /** Get the current question object */
-  getCurrentQuestion() {
-    return this.questions[this.currentIndex];
-  }
-
-  /** Select an answer for the current question */
-  selectAnswer(optionIndex) {
-    this.answers[this.currentIndex] = optionIndex;
-    this.saveProgress();
-  }
-
-  /** Move to next question. Returns false if already at last question. */
-  nextQuestion() {
-    if (this.currentIndex < this.questions.length - 1) {
-      this.currentIndex++;
-      return true;
-    }
-    return false;
-  }
-
-  /** Move to previous question. Returns false if already at first question. */
-  prevQuestion() {
-    if (this.currentIndex > 0) {
-      this.currentIndex--;
-      return true;
-    }
-    return false;
-  }
-
-  /** Calculate and store the final score */
-  calculateScore() {
-    this.score = 0;
-    for (let i = 0; i < this.questions.length; i++) {
-      if (this.answers[i] === this.questions[i].answer) {
-        this.score++;
-      }
-    }
-    this.isComplete = true;
-    this.saveProgress();
-    return this.score;
-  }
-
-  /** Save progress to localStorage */
-  saveProgress() {
-    const data = {
-      currentIndex: this.currentIndex,
-      answers: this.answers,
-      score: this.score,
-      isComplete: this.isComplete
-    };
-    localStorage.setItem(`quiz_${this.subject}`, JSON.stringify(data));
-  }
-
-  /** Load progress from localStorage */
-  loadProgress() {
-    const saved = localStorage.getItem(`quiz_${this.subject}`);
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        this.currentIndex = data.currentIndex || 0;
-        this.answers = data.answers || new Array(this.questions.length).fill(null);
-        this.score = data.score || 0;
-        this.isComplete = data.isComplete || false;
-      } catch (e) {
-        // If corrupted, start fresh
-        console.warn(`Could not load progress for ${this.subject}:`, e);
-      }
-    }
-  }
-
-  /** Reset this subject's progress */
-  reset() {
-    this.currentIndex = 0;
-    this.answers = new Array(this.questions.length).fill(null);
-    this.score = 0;
-    this.isComplete = false;
-    localStorage.removeItem(`quiz_${this.subject}`);
+// ---------- Page Detection ----------
+function detectPage() {
+  const path = window.location.pathname;
+  if (path.includes('scheme-detail')) {
+    renderDetailPage();
+  } else if (path.includes('schemes')) {
+    renderSchemesPage();
+  } else {
+    renderHomePage();
   }
 }
 
-// ===================== GLOBAL HELPERS =====================
-
-/**
- * Get scores for all subjects from localStorage.
- * Returns an object like { science: { score, total, complete }, ... }
- */
-function getAllScores() {
-  const scores = {};
-  for (const subject of Object.keys(QUESTIONS)) {
-    const saved = localStorage.getItem(`quiz_${subject}`);
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        scores[subject] = {
-          score: data.score || 0,
-          total: QUESTIONS[subject].length,
-          complete: data.isComplete || false
-        };
-      } catch (e) {
-        scores[subject] = { score: 0, total: QUESTIONS[subject].length, complete: false };
-      }
-    } else {
-      scores[subject] = { score: 0, total: QUESTIONS[subject].length, complete: false };
-    }
-  }
-  return scores;
-}
-
-/** Calculate total score across all subjects */
-function getTotalScore() {
-  const scores = getAllScores();
-  let total = 0, max = 0;
-  for (const s of Object.values(scores)) {
-    total += s.score;
-    max += s.total;
-  }
-  return { score: total, max };
-}
-
-/** Clear all quiz data from localStorage */
-function resetAllQuizzes() {
-  for (const subject of Object.keys(QUESTIONS)) {
-    localStorage.removeItem(`quiz_${subject}`);
-  }
-}
-
-/** Navigate with a transition effect */
-function navigateTo(url) {
-  document.body.style.opacity = '0';
-  document.body.style.transition = 'opacity 0.3s ease';
-  setTimeout(() => {
-    window.location.href = url;
-  }, 300);
-}
-
-// ===================== QUIZ UI RENDERER =====================
-
-/**
- * Renders quiz UI for a given subject page.
- * Expects these elements in the HTML:
- *   #question-number, #question-text, #options-container,
- *   #progress-bar, #progress-text, #btn-prev, #btn-next
- */
-function initQuizPage(subject) {
-  const engine = new QuizEngine(subject);
-
-  // If quiz already complete, redirect to results
-  if (engine.isComplete) {
-    // Allow retake by resetting
-    engine.reset();
-  }
-
-  const questionNumber = document.getElementById('question-number');
-  const questionText   = document.getElementById('question-text');
-  const optionsContainer = document.getElementById('options-container');
-  const progressBar    = document.getElementById('progress-bar');
-  const progressText   = document.getElementById('progress-text');
-  const prevBtn        = document.getElementById('btn-prev');
-  const nextBtn        = document.getElementById('btn-next');
-
-  const letters = ['A', 'B', 'C', 'D'];
-
-  function renderQuestion() {
-    const q = engine.getCurrentQuestion();
-    const idx = engine.currentIndex;
-    const total = engine.questions.length;
-
-    // Update progress
-    const percent = ((idx + 1) / total) * 100;
-    if (progressBar) progressBar.style.width = percent + '%';
-    if (progressText) progressText.textContent = `${idx + 1} / ${total}`;
-
-    // Question info
-    if (questionNumber) questionNumber.textContent = `Question ${idx + 1} of ${total}`;
-    if (questionText) questionText.textContent = q.question;
-
-    // Options
-    if (optionsContainer) {
-      optionsContainer.innerHTML = '';
-      q.options.forEach((opt, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        if (engine.answers[idx] === i) btn.classList.add('selected');
-
-        btn.innerHTML = `
-          <span class="option-letter">${letters[i]}</span>
-          <span class="option-text">${opt}</span>
-        `;
-
-        btn.addEventListener('click', () => {
-          engine.selectAnswer(i);
-          renderQuestion(); // Re-render to show selection
-        });
-
-        optionsContainer.appendChild(btn);
-      });
-    }
-
-    // Navigation buttons
-    if (prevBtn) {
-      prevBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
-    }
-
-    if (nextBtn) {
-      if (idx === total - 1) {
-        nextBtn.textContent = 'Finish Quiz →';
-        nextBtn.className = 'btn btn-success';
-      } else {
-        nextBtn.textContent = 'Next →';
-        nextBtn.className = 'btn btn-primary';
-      }
-    }
-  }
-
-  // Button listeners
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      if (engine.prevQuestion()) renderQuestion();
+// ==============================
+//  NAVBAR
+// ==============================
+function initNavbar() {
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+  if (hamburger && navLinks) {
+    hamburger.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', navLinks.classList.contains('open'));
     });
   }
+}
 
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      // Require an answer before proceeding
-      if (engine.answers[engine.currentIndex] === null) {
-        nextBtn.classList.add('shake');
-        setTimeout(() => nextBtn.classList.remove('shake'), 500);
-        return;
-      }
-
-      if (engine.currentIndex === engine.questions.length - 1) {
-        // Last question — calculate score and go to results
-        engine.calculateScore();
-        navigateTo('results.html');
-      } else {
-        engine.nextQuestion();
-        renderQuestion();
+// ==============================
+//  SCROLL ANIMATIONS
+// ==============================
+function initScrollAnimations() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
       }
     });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+}
+
+// ==============================
+//  HOME PAGE
+// ==============================
+function renderHomePage() {
+  const grid = document.getElementById('schemesGrid');
+  const searchInput = document.getElementById('heroSearch');
+  const filterChips = document.querySelectorAll('.filters__chip');
+
+  if (!grid) return;
+
+  let activeCategory = 'All';
+
+  // Render cards
+  function renderCards(filter = '', category = 'All') {
+    const filtered = SCHEMES.filter(s => {
+      const matchesSearch = s.name.toLowerCase().includes(filter.toLowerCase()) ||
+                            s.shortDesc.toLowerCase().includes(filter.toLowerCase());
+      const matchesCategory = category === 'All' || s.category === category;
+      return matchesSearch && matchesCategory;
+    });
+
+    grid.innerHTML = filtered.map(s => createSchemeCard(s)).join('');
+
+    // Re-observe for animations
+    document.querySelectorAll('.scheme-card.fade-in').forEach(el => {
+      el.classList.remove('visible');
+      setTimeout(() => el.classList.add('visible'), 50);
+    });
+
+    // No results
+    const noResults = document.getElementById('noResults');
+    if (noResults) {
+      noResults.classList.toggle('visible', filtered.length === 0);
+    }
   }
 
   // Initial render
-  renderQuestion();
-}
+  renderCards();
 
-// ===================== BACKGROUND GENERATORS =====================
-
-/** Generate twinkling stars for Science page */
-function generateStars(count = 100) {
-  const container = document.querySelector('.stars') || document.body;
-  for (let i = 0; i < count; i++) {
-    const star = document.createElement('div');
-    star.className = 'star';
-    star.style.left = Math.random() * 100 + '%';
-    star.style.top = Math.random() * 100 + '%';
-    star.style.setProperty('--duration', (2 + Math.random() * 4) + 's');
-    star.style.setProperty('--delay', (Math.random() * 3) + 's');
-    star.style.width = (1 + Math.random() * 2) + 'px';
-    star.style.height = star.style.width;
-    container.appendChild(star);
+  // Search
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      renderCards(e.target.value, activeCategory);
+    });
   }
+
+  // Category filters
+  filterChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      filterChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeCategory = chip.dataset.category;
+      const searchVal = searchInput ? searchInput.value : '';
+      renderCards(searchVal, activeCategory);
+    });
+  });
 }
 
-/** Generate floating geometric shapes for Math page */
-function generateGeoShapes(count = 15) {
-  const shapes = ['triangle', 'circle', 'square'];
-  for (let i = 0; i < count; i++) {
-    const el = document.createElement('div');
-    const shape = shapes[Math.floor(Math.random() * shapes.length)];
-    el.className = `geo-shape ${shape}`;
-    el.style.left = Math.random() * 100 + '%';
-    el.style.top = Math.random() * 100 + '%';
-    el.style.animation = `geoFloat ${5 + Math.random() * 8}s ease-in-out infinite`;
-    el.style.animationDelay = (Math.random() * 4) + 's';
-    document.body.appendChild(el);
+// ==============================
+//  SCHEMES LISTING PAGE
+// ==============================
+function renderSchemesPage() {
+  const grid = document.getElementById('listingGrid');
+  const searchInput = document.getElementById('listingSearch');
+  const filterChips = document.querySelectorAll('.filters__chip');
+
+  if (!grid) return;
+
+  let activeCategory = 'All';
+
+  function renderCards(filter = '', category = 'All') {
+    const filtered = SCHEMES.filter(s => {
+      const matchesSearch = s.name.toLowerCase().includes(filter.toLowerCase()) ||
+                            s.shortDesc.toLowerCase().includes(filter.toLowerCase()) ||
+                            s.category.toLowerCase().includes(filter.toLowerCase());
+      const matchesCategory = category === 'All' || s.category === category;
+      return matchesSearch && matchesCategory;
+    });
+
+    grid.innerHTML = filtered.map(s => createSchemeCard(s)).join('');
+
+    document.querySelectorAll('.scheme-card.fade-in').forEach(el => {
+      el.classList.remove('visible');
+      setTimeout(() => el.classList.add('visible'), 50);
+    });
+
+    const noResults = document.getElementById('noResults');
+    if (noResults) {
+      noResults.classList.toggle('visible', filtered.length === 0);
+    }
   }
-}
 
-/** Generate neon scan lines for CS page */
-function generateNeonLines(count = 6) {
-  for (let i = 0; i < count; i++) {
-    const line = document.createElement('div');
-    line.className = 'neon-line';
-    line.style.top = (15 + Math.random() * 70) + '%';
-    line.style.left = '0';
-    line.style.width = (30 + Math.random() * 70) + '%';
-    line.style.animationDelay = (Math.random() * 3) + 's';
-    line.style.animationDuration = (3 + Math.random() * 4) + 's';
-    document.body.appendChild(line);
+  renderCards();
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      renderCards(e.target.value, activeCategory);
+    });
   }
+
+  filterChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      filterChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeCategory = chip.dataset.category;
+      const searchVal = searchInput ? searchInput.value : '';
+      renderCards(searchVal, activeCategory);
+    });
+  });
 }
 
-// ===================== RESULTS PAGE =====================
-
-/** Render the results page with subject-wise scores */
-function initResultsPage() {
-  const scores = getAllScores();
-  const grid = document.getElementById('results-grid');
-  const totalEl = document.getElementById('total-score');
-  const totalMaxEl = document.getElementById('total-max');
-  const scoreCircle = document.getElementById('score-circle');
-  const messageEl = document.getElementById('result-message');
-
-  if (grid) {
-    grid.innerHTML = '';
-    for (const [subject, data] of Object.entries(scores)) {
-      const meta = SUBJECT_META[subject];
-      const percent = data.total > 0 ? (data.score / data.total) * 100 : 0;
-
-      const card = document.createElement('div');
-      card.className = `result-card ${subject}`;
-      card.innerHTML = `
-        <span class="subject-icon">${meta.icon}</span>
-        <div class="subject-name">${meta.name}</div>
-        <div class="score-value">${data.complete ? data.score + '/' + data.total : '—'}</div>
-        <div class="score-bar">
-          <div class="score-bar-fill" style="width: 0%"></div>
+// ==============================
+//  CREATE SCHEME CARD HTML
+// ==============================
+function createSchemeCard(scheme) {
+  const iconClass = CATEGORY_ICON_CLASS[scheme.category] || '';
+  return `
+    <a href="scheme-detail.html?id=${scheme.id}" class="scheme-card fade-in">
+      <div class="scheme-card__header">
+        <div class="scheme-card__icon ${iconClass}">${scheme.icon}</div>
+        <div>
+          <h3 class="scheme-card__title">${scheme.name}</h3>
+          <span class="scheme-card__category">${scheme.category}</span>
         </div>
-      `;
-
-      // Float animation variations
-      card.style.animationDelay = (Math.random() * 2) + 's';
-      grid.appendChild(card);
-
-      // Animate the bar fill
-      setTimeout(() => {
-        card.querySelector('.score-bar-fill').style.width = (data.complete ? percent : 0) + '%';
-      }, 500);
-    }
-  }
-
-  // Total score
-  const total = getTotalScore();
-  if (totalEl) totalEl.textContent = total.score;
-  if (totalMaxEl) totalMaxEl.textContent = total.max;
-
-  // Score circle
-  if (scoreCircle) {
-    const percent = total.max > 0 ? (total.score / total.max) * 100 : 0;
-    setTimeout(() => {
-      scoreCircle.style.setProperty('--score-percent', percent + '%');
-    }, 300);
-  }
-
-  // Message based on score
-  if (messageEl) {
-    const percent = total.max > 0 ? (total.score / total.max) * 100 : 0;
-    if (percent >= 80) {
-      messageEl.textContent = "🎉 Outstanding! You're a quiz master!";
-    } else if (percent >= 60) {
-      messageEl.textContent = "👏 Great job! Keep learning!";
-    } else if (percent >= 40) {
-      messageEl.textContent = "📚 Good effort! Room for improvement!";
-    } else {
-      messageEl.textContent = "💪 Don't give up! Try again!";
-    }
-  }
+      </div>
+      <p class="scheme-card__desc">${scheme.shortDesc}</p>
+      <div class="scheme-card__tags">
+        <span class="scheme-card__tag">Since ${scheme.launchYear}</span>
+        <span class="scheme-card__tag">${scheme.beneficiaries}</span>
+      </div>
+      <span class="scheme-card__link">View Details →</span>
+    </a>
+  `;
 }
 
-/** Render the final summary page */
-function initSummaryPage() {
-  const scores = getAllScores();
-  const total = getTotalScore();
-  const percent = total.max > 0 ? (total.score / total.max) * 100 : 0;
+// ==============================
+//  DETAIL PAGE
+// ==============================
+function renderDetailPage() {
+  const params = new URLSearchParams(window.location.search);
+  const schemeId = params.get('id');
+  const scheme = SCHEMES.find(s => s.id === schemeId);
 
-  const totalEl = document.getElementById('summary-total');
-  const maxEl = document.getElementById('summary-max');
-  const percentEl = document.getElementById('summary-percent');
-  const gradeEl = document.getElementById('summary-grade');
-  const breakdownEl = document.getElementById('summary-breakdown');
-  const scoreCircle = document.getElementById('summary-circle');
-
-  if (totalEl) totalEl.textContent = total.score;
-  if (maxEl) maxEl.textContent = total.max;
-  if (percentEl) percentEl.textContent = Math.round(percent) + '%';
-
-  // Grade
-  if (gradeEl) {
-    let grade = 'F';
-    if (percent >= 90) grade = 'A+';
-    else if (percent >= 80) grade = 'A';
-    else if (percent >= 70) grade = 'B';
-    else if (percent >= 60) grade = 'C';
-    else if (percent >= 50) grade = 'D';
-    gradeEl.textContent = grade;
+  if (!scheme) {
+    document.getElementById('detailContent').innerHTML = `
+      <div style="text-align:center;padding:80px 20px;">
+        <h2>Scheme Not Found</h2>
+        <p style="color:var(--text-secondary);margin:16px 0 24px;">The scheme you are looking for does not exist.</p>
+        <a href="schemes.html" class="btn-back">← Back to All Schemes</a>
+      </div>
+    `;
+    return;
   }
 
-  // Circle
-  if (scoreCircle) {
-    setTimeout(() => {
-      scoreCircle.style.setProperty('--score-percent', percent + '%');
-    }, 300);
+  // Title
+  const titleEl = document.getElementById('detailTitle');
+  if (titleEl) titleEl.textContent = scheme.name;
+
+  // Page title
+  document.title = `${scheme.name} — Jan Kalyan`;
+
+  // Breadcrumb
+  const breadcrumbName = document.getElementById('breadcrumbName');
+  if (breadcrumbName) breadcrumbName.textContent = scheme.name;
+
+  // Meta
+  const metaEl = document.getElementById('detailMeta');
+  if (metaEl) {
+    metaEl.innerHTML = `
+      <div class="detail-hero__meta-item"><span class="label">Ministry:</span> ${scheme.ministry}</div>
+      <div class="detail-hero__meta-item"><span class="label">Since:</span> ${scheme.launchYear}</div>
+      <div class="detail-hero__meta-item"><span class="label">Budget:</span> ${scheme.budget}</div>
+    `;
   }
 
-  // Breakdown
-  if (breakdownEl) {
-    breakdownEl.innerHTML = '';
-    for (const [subject, data] of Object.entries(scores)) {
-      const meta = SUBJECT_META[subject];
-      const p = data.total > 0 ? Math.round((data.score / data.total) * 100) : 0;
-      const row = document.createElement('div');
-      row.className = 'breakdown-row';
-      row.innerHTML = `
-        <span class="breakdown-icon">${meta.icon}</span>
-        <span class="breakdown-name">${meta.name}</span>
-        <span class="breakdown-score">${data.complete ? data.score + '/' + data.total : 'Not taken'}</span>
-        <span class="breakdown-percent" style="color: ${meta.color}">${data.complete ? p + '%' : '—'}</span>
-      `;
-      breakdownEl.appendChild(row);
-    }
+  // Overview
+  const overviewEl = document.getElementById('detailOverview');
+  if (overviewEl) overviewEl.textContent = scheme.description;
+
+  // Benefits
+  const benefitsEl = document.getElementById('detailBenefits');
+  if (benefitsEl) {
+    benefitsEl.innerHTML = scheme.benefits.map(b => `
+      <div class="benefit-card">
+        <div class="benefit-card__icon">${b.icon}</div>
+        <p class="benefit-card__text">${b.text}</p>
+      </div>
+    `).join('');
   }
-}
 
-// ===================== SUBJECT SELECTION PAGE =====================
+  // Eligibility
+  const eligibilityEl = document.getElementById('detailEligibility');
+  if (eligibilityEl) {
+    eligibilityEl.innerHTML = scheme.eligibility.map(e => `
+      <div class="eligibility-list__item">
+        <span class="eligibility-list__check">✓</span>
+        <span>${e}</span>
+      </div>
+    `).join('');
+  }
 
-/** Update subject cards to show completion status */
-function initSubjectSelection() {
-  const scores = getAllScores();
-  const cards = document.querySelectorAll('.subject-card');
+  // How to Apply
+  const applyEl = document.getElementById('detailApply');
+  if (applyEl) {
+    applyEl.innerHTML = scheme.howToApply.map((step, i) => `
+      <div class="steps-list__item">
+        <div class="steps-list__num">${i + 1}</div>
+        <p class="steps-list__text">${step}</p>
+      </div>
+    `).join('');
+  }
 
-  cards.forEach(card => {
-    const subject = card.dataset.subject;
-    if (subject && scores[subject]) {
-      const badge = card.querySelector('.status-badge');
-      if (badge) {
-        if (scores[subject].complete) {
-          badge.textContent = `✓ Done (${scores[subject].score}/${scores[subject].total})`;
-          badge.className = 'status-badge completed';
-        } else {
-          badge.textContent = 'Not started';
-          badge.className = 'status-badge not-started';
-        }
-      }
-    }
-  });
-}
-
-// ===================== LANDING PAGE EFFECTS =====================
-
-/** Animate letters individually on the landing page logo */
-function initLogoAnimation() {
-  const logo = document.querySelector('.antigravity-logo');
-  if (!logo) return;
-
-  const text = logo.dataset.text || 'AntiGravity';
-  logo.innerHTML = '';
-  text.split('').forEach((char, i) => {
-    const span = document.createElement('span');
-    span.className = 'letter';
-    span.textContent = char === ' ' ? '\u00A0' : char;
-    span.style.animationDelay = (i * 0.08) + 's';
-    logo.appendChild(span);
-  });
-}
-
-/** Create floating background elements for landing page */
-function initFloatingElements() {
-  const container = document.querySelector('.floating-elements');
-  if (!container) return;
-
-  // Already has static elements from HTML — add ~20 more small ones
-  for (let i = 0; i < 20; i++) {
-    const el = document.createElement('div');
-    el.className = 'floating-el';
-    const size = 10 + Math.random() * 40;
-    el.style.width = size + 'px';
-    el.style.height = size + 'px';
-    el.style.left = Math.random() * 100 + '%';
-    el.style.top = Math.random() * 100 + '%';
-    el.style.borderRadius = Math.random() > 0.5 ? '50%' : (Math.random() * 20) + 'px';
-
-    const colors = ['#4285f4', '#ea4335', '#fbbc05', '#34a853', '#a142f4', '#00bcd4'];
-    el.style.background = colors[Math.floor(Math.random() * colors.length)];
-    el.style.opacity = 0.05 + Math.random() * 0.1;
-
-    const duration = 6 + Math.random() * 10;
-    el.style.animation = `drift ${duration}s ease-in-out infinite`;
-    el.style.animationDelay = (Math.random() * 5) + 's';
-
-    container.appendChild(el);
+  // Sidebar
+  const sidebarEl = document.getElementById('detailSidebar');
+  if (sidebarEl) {
+    sidebarEl.innerHTML = `
+      <div class="sidebar-card">
+        <h3 class="sidebar-card__title">Quick Facts</h3>
+        <div class="sidebar-card__item">
+          <span class="sidebar-card__label">Ministry</span>
+          <span class="sidebar-card__value">${scheme.ministry.split('Ministry of ')[1] || scheme.ministry}</span>
+        </div>
+        <div class="sidebar-card__item">
+          <span class="sidebar-card__label">Launched</span>
+          <span class="sidebar-card__value">${scheme.launchYear}</span>
+        </div>
+        <div class="sidebar-card__item">
+          <span class="sidebar-card__label">Budget</span>
+          <span class="sidebar-card__value">${scheme.budget}</span>
+        </div>
+        <div class="sidebar-card__item">
+          <span class="sidebar-card__label">Beneficiaries</span>
+          <span class="sidebar-card__value">${scheme.beneficiaries}</span>
+        </div>
+        <div class="sidebar-card__item">
+          <span class="sidebar-card__label">Category</span>
+          <span class="sidebar-card__value">${scheme.category}</span>
+        </div>
+        <a href="${scheme.officialLink}" target="_blank" rel="noopener noreferrer" class="sidebar-card__btn">
+          Visit Official Website ↗
+        </a>
+      </div>
+    `;
   }
 }
-
-// ===================== INIT ON DOM READY =====================
-document.addEventListener('DOMContentLoaded', () => {
-  // Fade-in body
-  document.body.style.opacity = '1';
-  document.body.style.transition = 'opacity 0.3s ease';
-
-  // Determine which page we're on based on body classes or data attribute
-  const page = document.body.dataset.page;
-
-  switch (page) {
-    case 'landing':
-      initLogoAnimation();
-      initFloatingElements();
-      break;
-
-    case 'instructions':
-      // No special init needed — CSS handles animations
-      break;
-
-    case 'subjects':
-      initSubjectSelection();
-      break;
-
-    case 'science':
-      generateStars(120);
-      initQuizPage('science');
-      break;
-
-    case 'math':
-      generateGeoShapes(18);
-      initQuizPage('math');
-      break;
-
-    case 'history':
-      initQuizPage('history');
-      break;
-
-    case 'geography':
-      initQuizPage('geography');
-      break;
-
-    case 'cs':
-      generateNeonLines(8);
-      initQuizPage('cs');
-      break;
-
-    case 'results':
-      initResultsPage();
-      break;
-
-    case 'summary':
-      initSummaryPage();
-      initFloatingElements();
-      break;
-  }
-});
